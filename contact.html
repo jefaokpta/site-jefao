@@ -120,8 +120,8 @@
           </div>
         </div>
 
-        <form action="forms/contact.php" method="post" class="php-email-form" data-aos="fade-up" data-aos-delay="300">
-          <div class="row gy-4">
+        <form id="contactForm" class="php-email-form" data-aos="fade-up" data-aos-delay="300">
+        <div class="row gy-4">
 
             <div class="col-md-6">
               <input type="text" name="name" class="form-control" placeholder="Nome" required="">
@@ -132,17 +132,13 @@
             </div>
 
             <div class="col-md-12">
-              <input type="text" class="form-control" name="subject" placeholder="Assunto" required="">
-            </div>
-
-            <div class="col-md-12">
               <textarea class="form-control" name="message" rows="6" placeholder="Mensagem" required=""></textarea>
             </div>
 
             <div class="col-md-12 text-center">
-              <div class="loading">Loading</div>
+              <div class="loading">Enviando</div>
               <div class="error-message"></div>
-              <div class="sent-message">Your message has been sent. Thank you!</div>
+              <div class="sent-message">Mensagem enviada, até logo!</div>
 
               <button type="submit">Enviar</button>
             </div>
@@ -185,13 +181,46 @@
 
   <!-- Vendor JS Files -->
   <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
   <script src="assets/vendor/aos/aos.js"></script>
   <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const form = e.target;
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData);
+
+      try {
+        form.querySelector('.loading').style.display = 'block';
+
+        // Replace with your actual API endpoint
+        const params = new URLSearchParams(data);
+        const response = await fetch(`https://site-jpbx-mvc-1096160713048.us-central1.run.app/api/new-message?${params.toString()}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        if (response.ok) {
+          form.querySelector('.loading').style.display = 'none';
+          form.querySelector('.sent-message').style.display = 'block';
+          form.reset();
+        } else {
+          throw new Error('Failed to send message');
+        }
+      } catch (error) {
+        form.querySelector('.loading').style.display = 'none';
+        form.querySelector('.error-message').innerHTML = 'Falha ao enviar sua mensagem. Tente novamente mais tarde ou entre em contato diretamente pelos canais.';
+        form.querySelector('.error-message').style.display = 'block';
+      }
+    });
+  </script>
 
 </body>
 
